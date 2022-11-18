@@ -84,4 +84,35 @@ df_result_group.write.format("cosmos.oltp").options(cfg2).mode("APPEND").save()
 
 // COMMAND ----------
 
+// MAGIC %md
+// MAGIC #### Read a json from fileStore
 
+// COMMAND ----------
+
+val df_population = spark.read.format("json").option("multiline","true").load("/FileStore/tables/population_data.json")
+
+// COMMAND ----------
+
+df_population.printSchema()
+
+// COMMAND ----------
+
+display(df_population)
+
+
+// COMMAND ----------
+
+val cosmosEndpoint = "https://cosmoscursoudemy.documents.azure.com:443/"
+val cosmosMasterKey = "znWkRGK44bZjW5YO10pbauLIG4VYqTRsUZuXsAD20Z6YREVoHThltbrf6bgkXctXNiLxvSQXTTqYACDbXAuJSA=="
+val cosmosDatabaseName = "database-v3"
+val cosmosContainerName = "population"
+
+val cfg3 = Map("spark.cosmos.accountEndpoint" -> cosmosEndpoint,
+  "spark.cosmos.accountKey" -> cosmosMasterKey,
+  "spark.cosmos.database" -> cosmosDatabaseName,
+  "spark.cosmos.container" -> cosmosContainerName
+)
+
+// COMMAND ----------
+
+df_population.write.format("cosmos.oltp").options(cfg3).mode("APPEND").save()
